@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root{
+  --fg: 17 24 39;
+  --muted: 107 114 128;
+  --card: 255 255 255;
+  --cardA: 0.28;
+}
+.dark{
+  --fg: 229 231 235;
+  --muted: 156 163 175;
+  --card: 17 24 39;
+  --cardA: 0.35;
+}
+
+html, body, #root { height: 100%; }
+body { color: rgb(var(--fg)); }
