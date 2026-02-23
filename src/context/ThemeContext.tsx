@@ -1,3 +1,4 @@
+// src/context/ThemeContext.tsx
 import type { ReactNode } from "react";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
@@ -8,7 +9,7 @@ type ThemeCtx = {
 };
 
 const ThemeContext = createContext<ThemeCtx | null>(null);
-const KEY = "wa_theme"; // "dark" | "light"
+const KEY = "wa_theme";
 
 function getInitialDark(): boolean {
   if (typeof window === "undefined") return true;
@@ -17,7 +18,6 @@ function getInitialDark(): boolean {
   if (saved === "dark") return true;
   if (saved === "light") return false;
 
-  // Default: system preference, fallback dark (iOS Weather look)
   const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches;
   return prefersDark ?? true;
 }

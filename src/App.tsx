@@ -1,3 +1,4 @@
+// src/App.tsx
 import { useEffect, useMemo, useState } from "react";
 import {
   apiHistory,
@@ -24,10 +25,11 @@ import IosGrid from "./components/IosGrid";
 import IosMetricCard from "./components/IosMetricCard";
 import IosUvCard from "./components/IosUvCard";
 import IosBottomNav from "./components/IosBottomNav";
+import IosFeelsCard from "./components/IosFeelsCard";
 import { Card } from "./components/Card";
 import Charts from "./components/Charts";
 
-import { Activity, Droplets, Gauge, Lightbulb, Leaf, Thermometer } from "lucide-react";
+import { Activity, Droplets, Gauge, Lightbulb, Leaf } from "lucide-react";
 
 const DEVICE_ID = "ws-01";
 const LOCATION = "Geiselhöring";
@@ -56,16 +58,6 @@ function minMax(values: Array<number | null | undefined>) {
   const v = values.map(safeNum).filter((x): x is number => x != null);
   if (!v.length) return { lo: null, hi: null };
   return { lo: Math.min(...v), hi: Math.max(...v) };
-}
-
-function fmtRounded(v: number | null | undefined, suffix = ""): string | null {
-  if (v == null || !Number.isFinite(v)) return null;
-  return `${Math.round(v)}${suffix}`;
-}
-
-function fmtFixed(v: number | null | undefined, digits: number): string | null {
-  if (v == null || !Number.isFinite(v)) return null;
-  return v.toFixed(digits);
 }
 
 function RangePills(props: {
@@ -113,7 +105,7 @@ function ChartCard(props: {
   return (
     <Card className="p-4">
       <div className="flex items-start justify-between gap-4">
-        <div className="text-[11px] font-semibold tracking-[0.18em] text-[rgb(var(--color-muted))]">
+        <div className="text-[11px] font-semibold tracking-[0.22em] text-[rgb(var(--color-muted))]">
           {props.title.toUpperCase()}
         </div>
         <RangePills value={props.range} onChange={props.onRangeChange} items={props.rangeItems} />
@@ -143,10 +135,8 @@ export default function App() {
   const PAGES = 2;
 
   const [page, setPage] = useStoredState("wa_page", 0);
-
   const [autoRefresh, setAutoRefresh] = useStoredState("auto_refresh", true);
 
-  // Range pro Chart (persistiert)
   const [rTHP, setRTHP] = useStoredState<RangeKey>("range_thp", "24h");
   const [rUVL, setRUVL] = useStoredState<RangeKey>("range_uvl", "24h");
   const [rAIR, setRAIR] = useStoredState<RangeKey>("range_air", "24h");
@@ -161,13 +151,11 @@ export default function App() {
 
   const [err, setErr] = useState<string | null>(null);
 
-  // Clamp persisted page
   const pageClamped = Math.min(Math.max(0, page), PAGES - 1);
   useEffect(() => {
     if (page !== pageClamped) setPage(pageClamped);
   }, [page, pageClamped, setPage]);
 
-  // Latest poll (unverändert)
   useEffect(() => {
     let alive = true;
 
@@ -209,7 +197,6 @@ export default function App() {
     }
   }
 
-  // Initial loads per range (unverändert)
   useEffect(() => {
     loadHistory(rTHP, setHTHP);
   }, [rTHP]);
@@ -226,7 +213,6 @@ export default function App() {
     loadHistory(rVIB, setHVIB);
   }, [rVIB]);
 
-  // Periodic refresh for history (wenn Auto-Refresh an) (unverändert)
   useEffect(() => {
     if (!autoRefresh) return;
 
@@ -259,7 +245,6 @@ export default function App() {
   const airQ = useMemo(() => airQualityFromPct(latest?.mq_pct ?? null), [latest?.mq_pct]);
   const vibQ = useMemo(() => vibLabel(latest?.vib_ema ?? null), [latest?.vib_ema]);
 
-  // High/Low aus echten History-Werten (keine Fake-Werte)
   const { lo: loT, hi: hiT } = useMemo(() => minMax(hTHP.map((r) => r.t)), [hTHP]);
 
   const rangeItems = useMemo(
@@ -269,7 +254,6 @@ export default function App() {
 
   const nowTs = latest?.ts ?? null;
 
-  // ---- Cards (nur echte Daten / berechnet aus echten Inputs) ----
   const tempC = latest?.t ?? null;
   const humPct = latest?.h ?? null;
   const pressHpa = latest?.p ?? null;
@@ -281,36 +265,13 @@ export default function App() {
   const vibEma = latest?.vib_ema ?? null;
   const vibPeak = latest?.vib_peak ?? null;
 
-  const feelsValue = feels != null && Number.isFinite(feels) ? `${Math.round(feels)}°` : null;
-  const feelsSub =
-    tempC != null && Number.isFinite(tempC) ? `Tatsächlich: ${Math.round(tempC)}°` : null;
-
-  const feelsProgress =
-    tempC != null &&
-    Number.isFinite(tempC) &&
-    feels != null &&
-    Number.isFinite(feels) &&
-    loT != null &&
-    hiT != null &&
-    hiT > loT
-      ? {
-          min: loT,
-          max: hiT,
-          markers: [
-            { value: tempC, kind: "primary" as const },
-            { value: feels, kind: "secondary" as const },
-          ],
-        }
-      : undefined;
-
   const humidityValue = humPct != null && Number.isFinite(humPct) ? `${Math.round(humPct)}%` : null;
   const humiditySub =
-    dew != null && Number.isFinite(dew) ? `Taupunkt: ${Math.round(dew)}°` : null;
+    dew != null && Number.isFinite(dew) ? `Der Taupunkt liegt derzeit bei ${Math.round(dew)}°.` : null;
 
   const pressureValue =
     pressHpa != null && Number.isFinite(pressHpa) ? `${Math.round(pressHpa)} hPa` : null;
 
-  // Light: wenn Prozent da → Prozent anzeigen; sonst Lux (approx) wenn aus ldr_r berechnet
   let lightValue: string | null = null;
   let lightSub: string | null = null;
   let lightDetail: string | null = null;
@@ -334,7 +295,7 @@ export default function App() {
     vibPeak != null && Number.isFinite(vibPeak) ? `Peak: ${vibPeak.toFixed(3)}` : null;
 
   return (
-    <div className="min-h-screen">
+    <div className="wa-app min-h-screen">
       <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
         <IosTopArea
           location={LOCATION}
@@ -343,8 +304,6 @@ export default function App() {
           feelsC={feels}
           hiC={hiT}
           loC={loT}
-          autoRefresh={autoRefresh}
-          onToggleAutoRefresh={() => setAutoRefresh((v) => !v)}
         />
 
         {latest?.ts ? (
@@ -355,25 +314,14 @@ export default function App() {
 
         {err ? (
           <Card className="mt-4 border-rose-500/30 bg-rose-500/10 p-4">
-            <div className="text-sm font-semibold text-[rgb(var(--color-fg))]">
-              Fehler
-            </div>
-            <div className="mt-1 text-sm text-[rgb(var(--color-fg))] opacity-85">
-              {err}
-            </div>
+            <div className="text-sm font-semibold text-[rgb(var(--color-fg))]">Fehler</div>
+            <div className="mt-1 text-sm text-[rgb(var(--color-fg))] opacity-85">{err}</div>
           </Card>
         ) : null}
 
         {pageClamped === 0 ? (
           <IosGrid className="mt-6">
-            <IosMetricCard
-              title="Gefühlte Temperatur"
-              value={feelsValue}
-              sub={feelsSub}
-              detail={feelsValue == null ? null : null}
-              icon={<Thermometer className="h-4 w-4" />}
-              progress={feelsProgress}
-            />
+            <IosFeelsCard feelsC={feels} actualC={tempC} rangeMinC={loT} rangeMaxC={hiT} />
 
             <IosUvCard uvi={uvi} />
 
@@ -465,9 +413,7 @@ export default function App() {
               yAxes={[
                 { id: "mq", orientation: "left", domain: [0, 100], tickFormatter: (v) => `${Math.round(v)}%` },
               ]}
-              lines={[
-                { key: "mq_pct", name: "MQ %", yAxisId: "mq", color: "#34d399" },
-              ]}
+              lines={[{ key: "mq_pct", name: "MQ %", yAxisId: "mq", color: "#34d399" }]}
             />
 
             <ChartCard
@@ -478,9 +424,7 @@ export default function App() {
               data={hVIB}
               rangeMs={rangeMs(rVIB)}
               nowTs={nowTs}
-              yAxes={[
-                { id: "vib", orientation: "left", tickFormatter: (v) => String(v) },
-              ]}
+              yAxes={[{ id: "vib", orientation: "left", tickFormatter: (v) => String(v) }]}
               lines={[
                 { key: "vib_ema", name: "EMA", yAxisId: "vib", color: "#a78bfa" },
                 { key: "vib_peak", name: "Peak", yAxisId: "vib", color: "#f472b6", dashed: true },
@@ -490,7 +434,13 @@ export default function App() {
         )}
       </main>
 
-      <IosBottomNav page={pageClamped} pages={PAGES} onPageChange={setPage} />
+      <IosBottomNav
+        page={pageClamped}
+        pages={PAGES}
+        onPageChange={setPage}
+        autoRefresh={autoRefresh}
+        onToggleAutoRefresh={() => setAutoRefresh((v) => !v)}
+      />
     </div>
   );
 }

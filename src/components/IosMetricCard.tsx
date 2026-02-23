@@ -1,6 +1,10 @@
+// src/components/IosMetricCard.tsx
 import type { ReactNode } from "react";
-import { clamp } from "../lib/metrics";
 import { Card } from "./Card";
+
+function clamp(v: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, v));
+}
 
 type ProgressMarker = {
   value: number;
@@ -26,10 +30,8 @@ export default function IosMetricCard(props: {
 
   icon?: ReactNode;
 
-  /** Optional iOS-like small bar/marker(s) */
   progress?: Progress;
 
-  /** For grid spanning etc. e.g. "col-span-2" */
   className?: string;
 }) {
   const valueText =
@@ -47,10 +49,10 @@ export default function IosMetricCard(props: {
     props.progress.markers.length > 0;
 
   return (
-    <Card className={`p-4 min-h-[150px] ${props.className ?? ""}`}>
+    <Card className={`p-4 min-h-[164px] ${props.className ?? ""}`}>
       <div className="flex items-center gap-2">
         {props.icon ? <span className="shrink-0 opacity-70">{props.icon}</span> : null}
-        <div className="text-[11px] font-semibold tracking-[0.18em] text-[rgb(var(--color-muted))]">
+        <div className="text-[11px] font-semibold tracking-[0.22em] text-[rgb(var(--color-muted))]">
           {props.title.toUpperCase()}
         </div>
       </div>
@@ -60,7 +62,7 @@ export default function IosMetricCard(props: {
       </div>
 
       {props.sub ? (
-        <div className="mt-2 text-[13px] leading-snug text-[rgb(var(--color-fg))] opacity-80">
+        <div className="mt-2 text-[13px] leading-snug text-[rgb(var(--color-fg))] opacity-72">
           {props.sub}
         </div>
       ) : shouldShowNoDataLine ? (
@@ -77,7 +79,7 @@ export default function IosMetricCard(props: {
 
       {canShowBar ? (
         <div className="mt-3">
-          <div className="relative h-2 rounded-full bg-black/10 dark:bg-white/10">
+          <div className="relative h-1.5 rounded-full bg-black/10 dark:bg-white/10">
             {props.progress!.markers.map((m, idx) => {
               const pct = clamp(
                 ((m.value - props.progress!.min) / (props.progress!.max - props.progress!.min)) *
@@ -90,7 +92,7 @@ export default function IosMetricCard(props: {
               const markerCls =
                 kind === "secondary"
                   ? "bg-sky-300/90"
-                  : "bg-white/90 dark:bg-white/90";
+                  : "bg-white/85 dark:bg-white/90";
 
               return (
                 <div
@@ -98,7 +100,7 @@ export default function IosMetricCard(props: {
                   className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2"
                   style={{ left: `${pct}%` }}
                 >
-                  <div className={`h-4 w-1.5 rounded-full ${markerCls} shadow-ios-card-soft`} />
+                  <div className={`h-3.5 w-1 rounded-full ${markerCls} shadow-ios-card-soft`} />
                 </div>
               );
             })}
