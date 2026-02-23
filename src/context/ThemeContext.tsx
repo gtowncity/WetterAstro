@@ -11,12 +11,12 @@ const ThemeContext = createContext<ThemeCtx | null>(null);
 const KEY = "wa_theme"; // "dark" | "light"
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [dark, setDark] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    const saved = localStorage.getItem(KEY);
-    if (saved === "dark") return true;
-    if (saved === "light") return false;
-    return window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? true;
+const [dark, setDark] = useState<boolean>(() => {
+  if (typeof window === "undefined") return false; // DEFAULT: Light
+  const saved = localStorage.getItem(KEY);
+  if (saved === "dark") return true;
+  if (saved === "light") return false;
+  return false; // DEFAULT: Light
   });
 
   useEffect(() => {
