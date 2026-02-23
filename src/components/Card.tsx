@@ -1,28 +1,40 @@
 import type { HTMLAttributes, PropsWithChildren } from "react";
 
-type Variant = "raised" | "inset";
+type Variant = "glass" | "raised" | "inset";
 
+/**
+ * iOS-like frosted glass card.
+ * - backdrop blur ~24px (backdrop-blur-xl)
+ * - soft border + very soft shadow
+ * - subtle highlight gradient inside
+ */
 export function Card(
-  props: PropsWithChildren<HTMLAttributes<HTMLDivElement> & { variant?: Variant }>
+  props: PropsWithChildren<HTMLAttributes<HTMLDivElement> & { variant?: Variant }>,
 ) {
-  const { className = "", variant = "raised", children, ...rest } = props;
+  const { className = "", variant = "glass", children, ...rest } = props;
 
-  const lightShadow = variant === "inset" ? "shadow-neu-inset" : "shadow-neu";
+  const base =
+    "relative overflow-hidden rounded-[28px] border backdrop-blur-xl backdrop-saturate-150 " +
+    "transition-transform duration-200 ease-out active:scale-[0.99]";
+
+  const border = "border-black/5 dark:border-white/10";
+  const bg = "bg-[rgb(var(--color-card))]";
+
+  const shadow =
+    variant === "inset"
+      ? "shadow-ios-card-inset"
+      : variant === "raised"
+        ? "shadow-ios-card"
+        : "shadow-ios-card-soft";
 
   return (
-    <div
-      {...rest}
-      className={[
-        "rounded-3xl p-4 transition-all duration-200",
-        "bg-[rgb(var(--color-card))] text-[rgb(var(--color-fg))]",
-        lightShadow,
-        // Glass: wir nehmen 24px Blur (liegt in deinem 10–30px Zielbereich).
-        // Tailwind erlaubt arbitrary blur values: backdrop-blur-[24px] :contentReference[oaicite:3]{index=3}
-        "dark:bg-[rgb(var(--color-card))] dark:backdrop-blur-[24px] dark:border dark:border-white/10 dark:shadow-glass",
-        className,
-      ].join(" ")}
-    >
-      {children}
+    <div className={`${base} ${bg} ${border} ${shadow} ${className}`} {...rest}>
+      {/* subtle “glass highlight” */}
+      <div className="pointer-events-none absolute inset-0 opacity-70">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/25 via-white/8 to-transparent dark:from-white/20 dark:via-white/5" />
+      </div>
+
+      <div className="relative">{children}</div>
     </div>
   );
 }
