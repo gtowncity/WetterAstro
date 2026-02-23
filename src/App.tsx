@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   apiHistory,
   apiLatest,
@@ -8,9 +8,6 @@ import {
   type RangeKey,
   type Reading,
 } from "./lib/api";
-import { GlassCard, Pill } from "./components/ui";
-import Segmented from "./components/Segmented";
-import Charts from "./components/Charts";
 import { fmtAgo, fmtLocal } from "./lib/time";
 import {
   airQualityFromPct,
@@ -19,33 +16,41 @@ import {
   humidex,
   luxApproxFromOhm,
   vibLabel,
+  uviText,
 } from "./lib/metrics";
 import { useStoredState } from "./lib/store";
-import {
-  UvTile,
-  FeelsTile,
-  HumidityTile,
-  LightTile,
-  AirTile,
-  PressureTile,
-  VibrationTile,
-} from "./components/Tiles";
-import { CloudSun, MapPin } from "lucide-react";
+import Topbar from "./components/Topbar";
+import HeroSection from "./components/HeroSection";
+import StatusChips, { type ChipState } from "./components/StatusChips";
+import MetricCard from "./components/MetricCard";
+import ChartSection from "./components/ChartSection";
+import { Thermometer, Droplets, Sun, Lightbulb, Gauge, Wind, Activity } from "lucide-react";
 
 const DEVICE_ID = "ws-01";
+const LOCATION = "Geiselhöring";
 
-function clsStatus(s?: string | null) {
-  if (!s) return "warn" as const;
-  if (s === "OK") return "ok" as const;
-  if (s.startsWith("NC")) return "bad" as const;
-  if (s.includes("SHORT")) return "bad" as const;
-  return "warn" as const;
+function clsStatus(s?: string | null): ChipState {
+  if (!s) return "warn";
+  if (s === "OK") return "ok";
+  if (s.startsWith("NC")) return "bad";
+  if (s.includes("SHORT")) return "bad";
+  return "warn";
+}
+
+function safeNum(v: number | null | undefined) {
+  return v == null || !Number.isFinite(v) ? null : v;
+}
+
+function minMax(values: Array<number | null | undefined>) {
+  const v = values.map(safeNum).filter((x): x is number => x != null);
+  if (!v.length) return { lo: null, hi: null };
+  return { lo: Math.min(...v), hi: Math.max(...v) };
 }
 
 export default function App() {
-  const [dark, setDark] = useState(true);
+  const [autoRefresh, setAutoRefresh] = useStoredState<boolean>("auto_refresh", true);
 
-  // ✅ Persistiert nach Reload (pro Chart)
+  // Range pro Chart (persistiert)
   const [rTHP, setRTHP] = useStoredState<RangeKey>("range_thp", "24h");
   const [rUVL, setRUVL] = useStoredState<RangeKey>("range_uvl", "24h");
   const [rAIR, setRAIR] = useStoredState<RangeKey>("range_air", "24h");
@@ -58,13 +63,10 @@ export default function App() {
   const [hVIB, setHVIB] = useState<Reading[]>([]);
   const [err, setErr] = useState<string | null>(null);
 
-  useEffect(() => {
-    document.documentElement.classList.toggle("dark", dark);
-  }, [dark]);
-
   // Latest poll
   useEffect(() => {
     let alive = true;
+
     const load = async () => {
       try {
         const r = await apiLatest(DEVICE_ID);
@@ -76,13 +78,16 @@ export default function App() {
         setErr(e?.message || "latest failed");
       }
     };
+
     load();
-    const t = setInterval(load, 30000);
+    if (!autoRefresh) return () => { alive = false; };
+
+    const t = setInterval(load, 30_000);
     return () => {
       alive = false;
       clearInterval(t);
     };
-  }, []);
+  }, [autoRefresh]);
 
   async function loadHistory(range: RangeKey, setter: (d: Reading[]) => void) {
     try {
@@ -95,20 +100,23 @@ export default function App() {
     }
   }
 
+  // Initial loads per range
   useEffect(() => { loadHistory(rTHP, setHTHP); }, [rTHP]);
   useEffect(() => { loadHistory(rUVL, setHUVL); }, [rUVL]);
   useEffect(() => { loadHistory(rAIR, setHAIR); }, [rAIR]);
   useEffect(() => { loadHistory(rVIB, setHVIB); }, [rVIB]);
 
+  // Periodic refresh for history (wenn Auto-Refresh an)
   useEffect(() => {
+    if (!autoRefresh) return;
     const t = setInterval(() => {
       loadHistory(rTHP, setHTHP);
       loadHistory(rUVL, setHUVL);
       loadHistory(rAIR, setHAIR);
       loadHistory(rVIB, setHVIB);
-    }, 60000);
+    }, 60_000);
     return () => clearInterval(t);
-  }, [rTHP, rUVL, rAIR, rVIB]);
+  }, [autoRefresh, rTHP, rUVL, rAIR, rVIB]);
 
   const lastAbs = useMemo(() => fmtLocal(latest?.ts), [latest?.ts]);
   const lastAgo = useMemo(() => fmtAgo(latest?.ts), [latest?.ts]);
@@ -129,157 +137,192 @@ export default function App() {
   const airQ = useMemo(() => airQualityFromPct(latest?.mq_pct ?? null), [latest?.mq_pct]);
   const vibQ = useMemo(() => vibLabel(latest?.vib_ema ?? null), [latest?.vib_ema]);
 
-  const rangeItems = RANGE_PRESETS.map((p) => ({ key: p.key, label: p.label }));
+  // High/Low aus echten History-Werten (keine Fake-Werte)
+  const { lo: loT, hi: hiT } = useMemo(() => minMax(hTHP.map((r) => r.t)), [hTHP]);
+
+  const chips = useMemo(() => {
+    return [
+      { label: "BME", state: latest?.bme_ok === 1 ? "ok" : "warn" },
+      { label: "RTC", state: latest?.rtc_ok === 1 ? "ok" : "warn" },
+      { label: "IMU", state: latest?.imu_ok === 1 ? "ok" : "warn" },
+      { label: "UV", state: clsStatus(latest?.uv_status) },
+      { label: "Licht", state: clsStatus(latest?.ldr_status) },
+      { label: "MQ", state: clsStatus(latest?.mq_status) },
+    ] as { label: string; state: ChipState }[];
+  }, [latest]);
+
+  const rangeItems = useMemo(() => RANGE_PRESETS.map((p) => ({ key: p.key, label: p.label })), []);
+  const nowTs = latest?.ts ?? null;
 
   return (
-    <div className="min-h-full">
-      <div className="min-h-full px-4 py-6 bg-gradient-to-br from-sky-500/30 via-indigo-500/20 to-fuchsia-500/20 dark:from-slate-950 dark:via-slate-900 dark:to-black">
-        <div className="max-w-5xl mx-auto flex flex-col gap-5">
+    <div className="pb-10">
+      <Topbar
+        title="Wetterstation Emma"
+        location={LOCATION}
+        lastAbs={lastAbs}
+        lastAgo={lastAgo}
+        autoRefresh={autoRefresh}
+        onToggleAutoRefresh={() => setAutoRefresh((v) => !v)}
+      />
 
-          {/* HERO (Apple-ish) */}
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 justify-center text-white/90">
-              <CloudSun className="w-6 h-6" />
-              <div className="text-3xl font-semibold">Wetterstation Emma</div>
-              <span className="text-white/60">•</span>
-              <span className="text-sm text-white/70 inline-flex items-center gap-1">
-                <MapPin className="w-4 h-4" /> Geiselhöring
-              </span>
-            </div>
+      <HeroSection
+        tempC={safeNum(latest?.t)}
+        feelsC={safeNum(feels)}
+        hiC={hiT}
+        loC={loT}
+        subLabel={darkLabel}
+      />
 
-            <div className="mt-3 text-7xl font-semibold leading-none text-white/95">
-              {latest?.t != null ? `${Math.round(latest.t)}°` : "—"}
-            </div>
-
-            <div className="mt-2 text-lg text-white/80">
-              Gefühlt: {feels != null ? `${Math.round(feels)}°` : "—"}
-            </div>
-
-            <div className="mt-2 text-xs text-white/60">
-              Letztes Update: <span className="text-white/80">{lastAbs}</span>{" "}
-              <span className="text-white/45">({lastAgo})</span>
-            </div>
-
-            <div className="mt-3 flex items-center justify-center gap-2">
-              <button
-                className="px-3 py-1 rounded-full border bg-white/10 border-white/10 hover:bg-white/15 backdrop-blur-xl text-sm text-white/85"
-                onClick={() => setDark((v) => !v)}
-              >
-                {dark ? "Dark" : "Light"}
-              </button>
-
-              <span className="text-xs text-white/60 ml-2 inline-flex items-center gap-1">
-                <span className="w-2 h-2 rounded-full bg-emerald-400/80" />
-                Auto-Refresh
-              </span>
-            </div>
-
-            {err ? <div className="text-xs text-rose-200 mt-2">Fehler: {err}</div> : null}
-          </div>
-
-          {/* Status pills */}
-          <GlassCard className="p-4">
-            <div className="flex flex-wrap gap-2 justify-center">
-              <Pill label={`BME: ${latest?.bme_ok ? "OK" : "NC"}`} state={latest?.bme_ok ? "ok" : "bad"} />
-              <Pill label={`RTC: ${latest?.rtc_ok ? "OK" : "NC"}`} state={latest?.rtc_ok ? "ok" : "bad"} />
-              <Pill label={`IMU: ${latest?.imu_ok ? "OK" : "NC"}`} state={latest?.imu_ok ? "ok" : "bad"} />
-              <Pill label={`UV: ${latest?.uv_status || "?"}`} state={clsStatus(latest?.uv_status)} />
-              <Pill label={`Licht: ${latest?.ldr_status || "?"}`} state={clsStatus(latest?.ldr_status)} />
-              <Pill label={`MQ: ${latest?.mq_status || "?"}`} state={clsStatus(latest?.mq_status)} />
-            </div>
-          </GlassCard>
-
-          {/* ✅ Tiles wie Apple: 2 Spalten (auch am Handy), Reihenfolge wie Screenshot */}
-          <div className="grid grid-cols-2 gap-3 md:gap-4">
-            <FeelsTile
-              feelsC={feels}
-              actualC={latest?.t ?? null}
-              note="Humidex (aus Temperatur + Feuchte)"
-            />
-            <UvTile uvi={latest?.uv_uvi ?? null} status={latest?.uv_status ?? null} />
-
-            <HumidityTile h={latest?.h ?? null} dewC={dew} />
-            <LightTile lux={lux} pct={latest?.ldr_pct ?? null} darkness={darkLabel} />
-
-            <AirTile label={airQ.label} mqPct={latest?.mq_pct ?? null} />
-            <PressureTile p={latest?.p ?? null} />
-
-            {/* letztes Tile (wie Apple: kann alleine stehen) */}
-            <div className="col-span-2 md:col-span-1">
-              <VibrationTile label={vibQ.label} ema={latest?.vib_ema ?? null} peak={latest?.vib_peak ?? null} />
-            </div>
-          </div>
-
-          {/* CHARTS (bleiben) */}
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-white/85 font-semibold">Temp / Feuchte / Druck</div>
-            <Segmented value={rTHP} items={rangeItems} onChange={setRTHP} />
-          </div>
-          <Charts
-            title="Temperatur / Feuchte / Druck"
-            data={hTHP}
-            nowTs={latest?.ts ?? null}
-            rangeMs={rangeMs(rTHP)}
-            yAxes={[
-              { id: "t", orientation: "left", domain: ["dataMin - 1", "dataMax + 1"] },
-              { id: "h", orientation: "right", domain: [0, 100] },
-              { id: "p", orientation: "right", hide: true, domain: ["dataMin - 2", "dataMax + 2"] },
-            ]}
-            lines={[
-              { key: "t", name: "Temp", yAxisId: "t", color: "#ff6b6b" },
-              { key: "h", name: "Hum", yAxisId: "h", color: "#5eead4" },
-              { key: "p", name: "Druck", yAxisId: "p", color: "#a78bfa", dashed: true },
-            ]}
-          />
-
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-white/85 font-semibold">UV / Licht</div>
-            <Segmented value={rUVL} items={rangeItems} onChange={setRUVL} />
-          </div>
-          <Charts
-            title="UV / Licht"
-            data={hUVL}
-            nowTs={latest?.ts ?? null}
-            rangeMs={rangeMs(rUVL)}
-            yAxes={[
-              { id: "uv", orientation: "left", domain: [0, 12] },
-              { id: "light", orientation: "right", domain: [0, 100] },
-            ]}
-            lines={[
-              { key: "uv_uvi", name: "UVI", yAxisId: "uv", color: "#fbbf24" },
-              { key: "ldr_pct", name: "Licht %", yAxisId: "light", color: "#93c5fd" },
-            ]}
-          />
-
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-white/85 font-semibold">Air (MQ)</div>
-            <Segmented value={rAIR} items={rangeItems} onChange={setRAIR} />
-          </div>
-          <Charts
-            title="Air (MQ)"
-            data={hAIR}
-            nowTs={latest?.ts ?? null}
-            rangeMs={rangeMs(rAIR)}
-            yAxes={[{ id: "mq", orientation: "left", domain: [0, 100] }]}
-            lines={[{ key: "mq_pct", name: "MQ %", yAxisId: "mq", color: "#34d399" }]}
-          />
-
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-white/85 font-semibold">Vibration</div>
-            <Segmented value={rVIB} items={rangeItems} onChange={setRVIB} />
-          </div>
-          <Charts
-            title="Vibration"
-            data={hVIB}
-            nowTs={latest?.ts ?? null}
-            rangeMs={rangeMs(rVIB)}
-            yAxes={[{ id: "v", orientation: "left", domain: [0, "auto"] }]}
-            lines={[
-              { key: "vib_ema", name: "EMA", yAxisId: "v", color: "#60a5fa" },
-              { key: "vib_peak", name: "Peak", yAxisId: "v", color: "#f472b6", dashed: true },
-            ]}
-          />
+      {err ? (
+        <div className="px-4 max-w-5xl mx-auto mb-3 text-sm text-rose-600 dark:text-rose-300">
+          Fehler: {err}
         </div>
+      ) : null}
+
+      <StatusChips items={chips} />
+
+      {/* Metric Grid */}
+      <div className="px-4 max-w-5xl mx-auto mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <MetricCard
+          title="Temperatur"
+          value={latest?.t != null ? `${Math.round(latest.t)}°` : "—"}
+          sub={dew != null ? `Taupunkt: ${dew.toFixed(1)}°` : "Taupunkt: —"}
+          icon={<Thermometer size={18} />}
+          accent="rose"
+        />
+
+        <MetricCard
+          title="Gefühlt"
+          value={feels != null ? `${Math.round(feels)}°` : "—"}
+          sub={latest?.h != null ? `Humidex (aus Temp + Feuchte)` : "—"}
+          icon={<Wind size={18} />}
+          accent="violet"
+        />
+
+        <MetricCard
+          title="Feuchtigkeit"
+          value={latest?.h != null ? `${Math.round(latest.h)} %` : "—"}
+          sub={dew != null ? `Taupunkt aktuell: ${dew.toFixed(1)}°` : "—"}
+          icon={<Droplets size={18} />}
+          accent="sky"
+        />
+
+        <MetricCard
+          title="UV-Index"
+          value={latest?.uv_uvi != null ? String(Math.round(latest.uv_uvi)) : "—"}
+          sub={uviText(latest?.uv_uvi ?? null)}
+          icon={<Sun size={18} />}
+          accent="amber"
+        />
+
+        <MetricCard
+          title="Licht"
+          value={lux != null ? `${Math.round(lux)} lx` : (latest?.ldr_pct != null ? `${Math.round(latest.ldr_pct)} %` : "—")}
+          sub={darkLabel}
+          icon={<Lightbulb size={18} />}
+          accent="sky"
+        />
+
+        <MetricCard
+          title="Luftdruck"
+          value={latest?.p != null ? `${latest.p.toFixed(1)} hPa` : "—"}
+          icon={<Gauge size={18} />}
+          accent="emerald"
+        />
+
+        <MetricCard
+          title="Air Quality"
+          value={airQ.label}
+          sub={latest?.mq_pct != null ? `MQ: ${Math.round(latest.mq_pct)}%` : "MQ: —"}
+          icon={<Activity size={18} />}
+          accent={airQ.state === "bad" ? "rose" : airQ.state === "warn" ? "amber" : "emerald"}
+        />
+
+        <MetricCard
+          title="Vibration"
+          value={vibQ.label}
+          sub={
+            latest?.vib_ema != null && latest?.vib_peak != null
+              ? `EMA: ${latest.vib_ema.toFixed(4)} · Peak: ${latest.vib_peak.toFixed(4)}`
+              : "EMA/Peak: —"
+          }
+          icon={<Activity size={18} />}
+          accent={vibQ.state === "bad" ? "rose" : vibQ.state === "warn" ? "amber" : "emerald"}
+        />
+      </div>
+
+      {/* Charts */}
+      <div className="px-4 max-w-5xl mx-auto mt-8">
+        <ChartSection
+          title="Temp / Feuchte / Druck"
+          range={rTHP}
+          onRangeChange={setRTHP}
+          rangeItems={rangeItems}
+          data={hTHP}
+          rangeMs={rangeMs(rTHP)}
+          nowTs={nowTs}
+          yAxes={[
+            { id: "t", orientation: "left", tickFormatter: (v) => `${Math.round(v)}°` },
+            { id: "h", orientation: "right", domain: [0, 100], tickFormatter: (v) => `${Math.round(v)}%` },
+            { id: "p", orientation: "right", hide: true },
+          ]}
+          lines={[
+            { key: "t", name: "Temperatur", yAxisId: "t", color: "#f43f5e" },
+            { key: "h", name: "Feuchte", yAxisId: "h", color: "#60a5fa", dashed: true },
+            { key: "p", name: "Druck", yAxisId: "p", color: "#34d399" },
+          ]}
+        />
+
+        <ChartSection
+          title="UV / Licht"
+          range={rUVL}
+          onRangeChange={setRUVL}
+          rangeItems={rangeItems}
+          data={hUVL}
+          rangeMs={rangeMs(rUVL)}
+          nowTs={nowTs}
+          yAxes={[
+            { id: "uv", orientation: "left", domain: [0, 12], tickFormatter: (v) => `${Math.round(v)}` },
+            { id: "ldr", orientation: "right", domain: [0, 100], tickFormatter: (v) => `${Math.round(v)}%` },
+          ]}
+          lines={[
+            { key: "uv_uvi", name: "UV Index", yAxisId: "uv", color: "#f59e0b" },
+            { key: "ldr_pct", name: "Licht %", yAxisId: "ldr", color: "#60a5fa" },
+          ]}
+        />
+
+        <ChartSection
+          title="Air (MQ)"
+          range={rAIR}
+          onRangeChange={setRAIR}
+          rangeItems={rangeItems}
+          data={hAIR}
+          rangeMs={rangeMs(rAIR)}
+          nowTs={nowTs}
+          yAxes={[
+            { id: "mq", orientation: "left", domain: [0, 100], tickFormatter: (v) => `${Math.round(v)}%` },
+          ]}
+          lines={[
+            { key: "mq_pct", name: "MQ %", yAxisId: "mq", color: "#34d399" },
+          ]}
+        />
+
+        <ChartSection
+          title="Vibration"
+          range={rVIB}
+          onRangeChange={setRVIB}
+          rangeItems={rangeItems}
+          data={hVIB}
+          rangeMs={rangeMs(rVIB)}
+          nowTs={nowTs}
+          yAxes={[
+            { id: "vib", orientation: "left", tickFormatter: (v) => String(v) },
+          ]}
+          lines={[
+            { key: "vib_ema", name: "EMA", yAxisId: "vib", color: "#a78bfa" },
+            { key: "vib_peak", name: "Peak", yAxisId: "vib", color: "#f472b6", dashed: true },
+          ]}
+        />
       </div>
     </div>
   );

@@ -1,34 +1,19 @@
 import type { HTMLAttributes, PropsWithChildren } from "react";
+import { Card } from "./Card";
 
-export function GlassCard(
-  props: PropsWithChildren<HTMLAttributes<HTMLDivElement> & { className?: string }>
-) {
-  const { className = "", children, ...rest } = props;
-
-  return (
-    <div
-      {...rest}
-      className={[
-        "rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-lg",
-        className,
-      ].join(" ")}
-    >
-      {children}
-    </div>
-  );
+export function GlassCard(props: PropsWithChildren<HTMLAttributes<HTMLDivElement> & { className?: string }>) {
+  // Legacy wrapper -> neue Card
+  const { className = "", ...rest } = props;
+  return <Card className={className} {...rest} />;
 }
 
-export function Pill(props: {
-  label: string;
-  state: "ok" | "warn" | "bad";
-  className?: string;
-}) {
+export function Pill(props: { label: string; state: "ok" | "warn" | "bad"; className?: string }) {
   const c =
     props.state === "ok"
-      ? "bg-emerald-500/20 text-emerald-100 border-emerald-400/20"
+      ? "border-emerald-500/30 bg-emerald-500/15 text-emerald-700 dark:text-emerald-100"
       : props.state === "warn"
-      ? "bg-amber-500/20 text-amber-100 border-amber-400/20"
-      : "bg-rose-500/20 text-rose-100 border-rose-400/20";
+      ? "border-amber-500/30 bg-amber-500/15 text-amber-700 dark:text-amber-100"
+      : "border-rose-500/30 bg-rose-500/15 text-rose-700 dark:text-rose-100";
 
   return (
     <span

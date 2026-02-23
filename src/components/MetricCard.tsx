@@ -1,44 +1,43 @@
-import React from "react";
-import { GlassCard } from "./ui";
-import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+import { Card } from "./Card";
 
 export default function MetricCard(props: {
   title: string;
-  value: string;
+  value: string; // "—" erlaubt
   sub?: string;
-  icon: LucideIcon;
-  accent?: "blue" | "red" | "green" | "yellow" | "purple" | "pink" | "gray";
-  onClick?: () => void;
+  icon?: ReactNode;
+  accent?: "sky" | "emerald" | "amber" | "rose" | "violet";
 }) {
-  const Icon = props.icon;
+  const bar =
+    props.accent === "emerald"
+      ? "bg-emerald-500/50"
+      : props.accent === "amber"
+      ? "bg-amber-500/50"
+      : props.accent === "rose"
+      ? "bg-rose-500/50"
+      : props.accent === "violet"
+      ? "bg-violet-500/50"
+      : "bg-sky-500/50";
 
-  const accent =
-    props.accent === "red" ? "bg-rose-500/15 border-rose-400/15" :
-    props.accent === "blue" ? "bg-sky-500/15 border-sky-400/15" :
-    props.accent === "green" ? "bg-emerald-500/15 border-emerald-400/15" :
-    props.accent === "yellow" ? "bg-amber-500/15 border-amber-400/15" :
-    props.accent === "purple" ? "bg-violet-500/15 border-violet-400/15" :
-    props.accent === "pink" ? "bg-fuchsia-500/15 border-fuchsia-400/15" :
-    "bg-white/10 border-white/10";
+  const isDash = props.value.trim() === "—";
 
   return (
-    <GlassCard
-      className={[
-        "p-4",
-        props.onClick ? "cursor-pointer active:scale-[0.99] transition" : "",
-      ].join(" ")}
-      onClick={props.onClick as any}
-    >
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="text-sm text-white/70">{props.title}</div>
-          <div className="text-2xl font-semibold leading-tight">{props.value}</div>
-          {props.sub ? <div className="text-xs text-white/60 mt-1">{props.sub}</div> : null}
+    <Card className="hover:-translate-y-0.5 active:translate-y-0 transition-transform">
+      <div className={`h-1 w-full rounded-full ${bar}`} />
+      <div className="mt-3 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-xs uppercase tracking-wide text-[rgb(var(--color-muted))]">
+            {props.title}
+          </div>
+          <div className={["text-2xl font-semibold leading-tight", isDash ? "text-[rgb(var(--color-muted))]" : ""].join(" ")}>
+            {props.value}
+          </div>
+          {props.sub && (
+            <div className="mt-1 text-xs text-[rgb(var(--color-muted))]">{props.sub}</div>
+          )}
         </div>
-        <div className={["p-2 rounded-xl border", accent].join(" ")}>
-          <Icon className="w-5 h-5" />
-        </div>
+        {props.icon ? <div className="opacity-70">{props.icon}</div> : null}
       </div>
-    </GlassCard>
+    </Card>
   );
 }
