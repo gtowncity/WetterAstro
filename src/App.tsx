@@ -20,7 +20,8 @@ import {
 } from "./lib/metrics";
 import { useStoredState } from "./lib/store";
 
-import IosTopArea from "./components/IosTopArea";
+// import IosTopArea from "./components/IosTopArea";
+import HeroPrototype from "./components/HeroPrototype";
 import IosGrid from "./components/IosGrid";
 import IosMetricCard from "./components/IosMetricCard";
 import IosUvCard from "./components/IosUvCard";
@@ -296,16 +297,10 @@ export default function App() {
 
   return (
     <div className="wa-app min-h-screen">
-      <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
-        <IosTopArea
-          location={LOCATION}
-          privacyLabel="PRIVAT"
-          tempC={tempC}
-          feelsC={feels}
-          hiC={hiT}
-          loC={loT}
-        />
+      {/* ── Full-width hero prototype (temporary) ── */}
+      <HeroPrototype />
 
+      <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
         {latest?.ts ? (
           <div className="mt-2 text-center text-[12px] text-[rgb(var(--color-muted))]">
             Letztes Update: {lastAbs} ({lastAgo})
