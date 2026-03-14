@@ -248,31 +248,32 @@ body::after {
   opacity: 0.18;
 }
 
-/* Hero: cinematic top section */
+/* Hero: cinematic top section — full-width stage */
 .wa-hero {
   position: relative;
-  /* Light-mode: soft sky atmosphere */
+  overflow: hidden;
+  /* Light-mode: soft sky atmosphere spanning full width */
   background: linear-gradient(
     to bottom,
-    rgba(190, 220, 255, 0.45) 0%,
-    rgba(210, 230, 255, 0.22) 55%,
+    rgba(165, 210, 255, 0.55) 0%,
+    rgba(190, 225, 255, 0.28) 55%,
     transparent 100%
   );
 }
 
-/* Dark-mode hero: deep cinematic stage */
+/* Dark-mode hero: deep cinematic full-bleed stage */
 .dark .wa-hero {
   background:
     linear-gradient(
       to bottom,
-      rgba(2, 8, 32, 0.97) 0%,
-      rgba(3, 12, 42, 0.90) 52%,
-      rgba(3, 12, 42, 0.58) 80%,
+      rgba(1, 6, 28, 1.0) 0%,
+      rgba(2, 10, 38, 0.96) 42%,
+      rgba(3, 13, 48, 0.70) 72%,
       transparent 100%
     );
 }
 
-/* Strong sky-glow behind hero text (dark mode) */
+/* Strong sky-glow behind hero text (dark mode) — full-width */
 .dark .wa-hero::before {
   content: "";
   position: absolute;
@@ -281,14 +282,19 @@ body::after {
   z-index: 0;
   background:
     radial-gradient(
-      ellipse 200% 88% at 50% 44%,
-      rgba(32, 92, 215, 0.72),
-      transparent 65%
+      ellipse 120% 75% at 50% 52%,
+      rgba(28, 82, 200, 0.80),
+      transparent 62%
     ),
     radial-gradient(
-      ellipse 110% 44% at 50% -6%,
-      rgba(108, 178, 255, 0.52),
-      transparent 56%
+      ellipse 80% 38% at 50% -4%,
+      rgba(90, 160, 255, 0.60),
+      transparent 54%
+    ),
+    radial-gradient(
+      ellipse 60% 28% at 50% 18%,
+      rgba(140, 195, 255, 0.30),
+      transparent 48%
     );
 }
 
@@ -299,16 +305,16 @@ body::after {
   left: 0;
   right: 0;
   bottom: 0;
-  height: 80px;
+  height: 120px;
   pointer-events: none;
-  z-index: 0;
+  z-index: 2;
   background: linear-gradient(to bottom, transparent, rgb(var(--color-bg)));
 }
 
 /* All direct children of wa-hero sit above the pseudo layers */
 .wa-hero > * {
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 /* Optional safe-area helpers */

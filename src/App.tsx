@@ -296,16 +296,17 @@ export default function App() {
 
   return (
     <div className="wa-app min-h-screen">
-      <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
-        <IosTopArea
-          location={LOCATION}
-          privacyLabel="PRIVAT"
-          tempC={tempC}
-          feelsC={feels}
-          hiC={hiT}
-          loC={loT}
-        />
+      {/* Hero is full-width — outside the narrow content container */}
+      <IosTopArea
+        location={LOCATION}
+        privacyLabel="PRIVAT"
+        tempC={tempC}
+        feelsC={feels}
+        hiC={hiT}
+        loC={loT}
+      />
 
+      <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
         {latest?.ts ? (
           <div className="mt-2 text-center text-[12px] text-[rgb(var(--color-muted))]">
             Letztes Update: {lastAbs} ({lastAgo})

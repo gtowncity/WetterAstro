@@ -26,18 +26,18 @@ export default function IosTopArea(props: Props) {
     Number.isFinite(props.loC);
 
   return (
-    <header className="wa-hero flex min-h-[72dvh] flex-col items-center justify-center pt-[calc(env(safe-area-inset-top)+20px)] pb-20 text-center font-ios">
-      <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-[0.32em] uppercase text-[rgb(var(--color-muted))] opacity-80">
-        <Navigation className="h-3 w-3 opacity-70" />
+    <header className="wa-hero w-full overflow-hidden flex min-h-[78dvh] flex-col items-center justify-center pt-[calc(env(safe-area-inset-top)+24px)] pb-24 text-center font-ios">
+      <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold tracking-[0.32em] uppercase text-[rgb(var(--color-muted))] opacity-70">
+        <Navigation className="h-3 w-3 opacity-60" />
         <span>{props.privacyLabel ?? "PRIVAT"}</span>
       </div>
 
-      <h1 className="mt-4 text-[44px] font-semibold leading-tight tracking-[-0.01em] text-[rgb(var(--color-fg))] sm:text-[52px]">
+      <h1 className="mt-5 text-[46px] font-semibold leading-tight tracking-[-0.02em] text-[rgb(var(--color-fg))] sm:text-[56px]">
         {props.location}
       </h1>
 
-      <div className="mt-2 flex flex-col items-center">
-        <div className="text-[128px] font-thin leading-none tracking-[-0.06em] text-[rgb(var(--color-fg))] sm:text-[144px]">
+      <div className="mt-1 flex flex-col items-center">
+        <div className="text-[132px] font-thin leading-none tracking-[-0.06em] text-[rgb(var(--color-fg))] sm:text-[148px]">
           {fmtDeg(props.tempC)}
         </div>
 
@@ -46,13 +46,13 @@ export default function IosTopArea(props: Props) {
         ) : null}
 
         {hasFeels ? (
-          <div className="mt-4 text-[13px] leading-tight text-[rgb(var(--color-fg))] opacity-50">
+          <div className="mt-5 text-[13px] leading-tight text-[rgb(var(--color-fg))] opacity-45">
             Gefühlt: {fmtDeg(props.feelsC)}
           </div>
         ) : null}
 
         {hasHiLo ? (
-          <div className="mt-1.5 text-[13px] leading-tight text-[rgb(var(--color-fg))] opacity-50">
+          <div className="mt-1.5 text-[13px] leading-tight text-[rgb(var(--color-fg))] opacity-45">
             H: {fmtDeg(props.hiC)}&nbsp;&nbsp;T: {fmtDeg(props.loC)}
           </div>
         ) : null}
