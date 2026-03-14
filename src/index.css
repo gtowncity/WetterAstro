@@ -255,3 +255,233 @@ body::after {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
 }
+
+/* ═══════════════════════════════════════════════
+   HeroPrototype – Apple-Weather cinematic hero
+   ═══════════════════════════════════════════════ */
+
+.hero-proto {
+  position: relative;
+  width: 100%;
+  height: 60dvh;
+  min-height: 360px;
+  max-height: 520px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+
+  /* Dark blue-gray atmospheric sky gradient */
+  background:
+    linear-gradient(
+      to bottom,
+      hsl(216 32% 18%) 0%,
+      hsl(218 30% 14%) 38%,
+      hsl(220 28% 10%) 70%,
+      hsl(222 30% 7%) 100%
+    );
+}
+
+/* ── Cloud bank (upper 25-30%) ── */
+.hero-proto__clouds {
+  position: absolute;
+  top: 0;
+  left: -8%;
+  right: -8%;
+  height: 42%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.hero-proto__cloud {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(18px);
+  will-change: transform;
+}
+
+/* Main central cloud mass */
+.hero-proto__cloud--main {
+  width: 110%;
+  height: 120%;
+  left: -5%;
+  top: -50%;
+  background:
+    radial-gradient(
+      ellipse 100% 80% at 50% 60%,
+      rgba(160, 185, 210, 0.38) 0%,
+      rgba(120, 150, 185, 0.22) 35%,
+      rgba(80, 115, 155, 0.10) 60%,
+      transparent 80%
+    );
+  animation: hero-cloud-drift 32s ease-in-out infinite alternate;
+}
+
+/* Left cloud – slightly smaller, offset */
+.hero-proto__cloud--left {
+  width: 70%;
+  height: 100%;
+  left: -18%;
+  top: -30%;
+  background:
+    radial-gradient(
+      ellipse 90% 75% at 55% 65%,
+      rgba(140, 170, 200, 0.30) 0%,
+      rgba(100, 140, 180, 0.14) 40%,
+      transparent 72%
+    );
+  animation: hero-cloud-drift 38s ease-in-out infinite alternate-reverse;
+}
+
+/* Right cloud – different size for asymmetry */
+.hero-proto__cloud--right {
+  width: 62%;
+  height: 95%;
+  right: -12%;
+  left: auto;
+  top: -26%;
+  background:
+    radial-gradient(
+      ellipse 85% 70% at 45% 60%,
+      rgba(130, 165, 200, 0.26) 0%,
+      rgba(90, 130, 170, 0.12) 40%,
+      transparent 70%
+    );
+  animation: hero-cloud-drift 28s ease-in-out infinite alternate;
+  animation-delay: -6s;
+}
+
+/* ── Atmospheric fog / depth layer ── */
+.hero-proto__fog {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 140% 50% at 50% 55%,
+      rgba(90, 120, 160, 0.08) 0%,
+      transparent 60%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 50%,
+      rgba(8, 14, 30, 0.45) 100%
+    );
+}
+
+/* ── Soft glow behind text area ── */
+.hero-proto__glow {
+  position: absolute;
+  width: 72%;
+  height: 38%;
+  bottom: 12%;
+  left: 14%;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse 100% 100% at 50% 50%,
+      rgba(120, 160, 210, 0.10) 0%,
+      rgba(80, 120, 180, 0.04) 50%,
+      transparent 80%
+    );
+  filter: blur(30px);
+}
+
+/* ── Text block (positioned ~54% from top) ── */
+.hero-proto__text {
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 84%;
+  margin-bottom: 8%;
+  color: rgba(235, 243, 255, 0.95);
+}
+
+.hero-proto__privacy {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  color: rgba(180, 200, 225, 0.65);
+  margin-bottom: 14px;
+}
+
+.hero-proto__location {
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0 0 6px;
+  color: rgba(235, 243, 255, 0.97);
+}
+
+.hero-proto__temp {
+  font-size: 96px;
+  font-weight: 200;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: rgba(235, 243, 255, 0.98);
+  margin-bottom: 8px;
+}
+
+.hero-proto__feels {
+  font-size: 16px;
+  font-weight: 400;
+  color: rgba(200, 218, 240, 0.80);
+  margin-bottom: 4px;
+}
+
+.hero-proto__hilo {
+  font-size: 15px;
+  font-weight: 400;
+  color: rgba(200, 218, 240, 0.75);
+  margin-bottom: 16px;
+}
+
+.hero-proto__hint {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: rgba(200, 218, 240, 0.78);
+  max-width: 260px;
+  margin: 0;
+}
+
+/* ── Bottom fade (soft transition to cards) ── */
+.hero-proto__fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(2, 6, 23, 0.55) 50%,
+      rgb(2, 6, 23) 100%
+    );
+}
+
+/* ── Cloud drift animation ── */
+@keyframes hero-cloud-drift {
+  0% {
+    transform: translate3d(-1.2%, -0.5%, 0) scale(1);
+  }
+  100% {
+    transform: translate3d(1.2%, 0.5%, 0) scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-proto__cloud {
+    animation: none !important;
+  }
+}
