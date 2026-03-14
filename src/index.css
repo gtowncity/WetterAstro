@@ -248,6 +248,192 @@ body::after {
   opacity: 0.18;
 }
 
+/* ============================================================
+   Hero Prototype – Apple Weather × CARROT cinematic scene
+   ============================================================ */
+
+.hero-proto {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+  padding-top: calc(env(safe-area-inset-top, 0px) + 24px);
+}
+
+/* ---- Sky / atmosphere ---- */
+.hero-proto__sky {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+
+  /* deep blue-gray night sky */
+  background: linear-gradient(
+    180deg,
+    #0f1c2e 0%,
+    #162a46 28%,
+    #1b324f 48%,
+    #111d30 72%,
+    rgb(var(--color-bg)) 100%
+  );
+}
+
+/* upper broad soft cloud bank */
+.hero-proto__cloud--top {
+  position: absolute;
+  top: -8%;
+  left: -16%;
+  right: -16%;
+  height: 62%;
+  border-radius: 0 0 50% 50% / 0 0 100% 100%;
+  background: radial-gradient(
+    ellipse 120% 100% at 50% 0%,
+    rgba(160, 195, 230, 0.38) 0%,
+    rgba(120, 160, 210, 0.22) 36%,
+    rgba(80, 130, 190, 0.10) 60%,
+    transparent 82%
+  );
+  filter: blur(18px);
+  animation: hero-cloud-drift 22s ease-in-out infinite alternate;
+}
+
+/* mid-height softer secondary cloud */
+.hero-proto__cloud--mid {
+  position: absolute;
+  top: 18%;
+  left: -10%;
+  right: -10%;
+  height: 50%;
+  border-radius: 0 0 45% 55% / 0 0 80% 80%;
+  background: radial-gradient(
+    ellipse 100% 90% at 40% 20%,
+    rgba(140, 180, 220, 0.20) 0%,
+    rgba(100, 150, 200, 0.10) 40%,
+    transparent 72%
+  );
+  filter: blur(22px);
+  animation: hero-cloud-drift 28s ease-in-out infinite alternate-reverse;
+}
+
+/* depth haze in the lower sky area */
+.hero-proto__depth {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 55%;
+  background: linear-gradient(
+    to top,
+    rgb(var(--color-bg)) 0%,
+    rgba(var(--color-bg) / 0.85) 24%,
+    rgba(var(--color-bg) / 0.40) 52%,
+    transparent 100%
+  );
+}
+
+/* ---- Content block ---- */
+.hero-proto__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 24px 28px;
+  max-width: 520px;
+  width: 100%;
+}
+
+.hero-proto__location {
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.15;
+  color: rgb(var(--color-fg));
+  margin: 0;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+.hero-proto__temp {
+  font-size: 96px;
+  font-weight: 200;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgb(var(--color-fg));
+  margin: 2px 0 0;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.30);
+}
+
+.hero-proto__condition {
+  font-size: 15px;
+  font-weight: 500;
+  color: rgb(var(--color-muted));
+  margin: 4px 0 0;
+  letter-spacing: 0.01em;
+}
+
+.hero-proto__meta {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(var(--color-fg));
+  opacity: 0.72;
+}
+
+.hero-proto__sep {
+  opacity: 0.40;
+}
+
+/* ---- Bottom fade (hero → cards) ---- */
+.hero-proto__fade {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 64px;
+  z-index: 3;
+  background: linear-gradient(
+    to top,
+    rgb(var(--color-bg)) 0%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+/* ---- Cloud drift animation ---- */
+@keyframes hero-cloud-drift {
+  0% {
+    transform: translateX(-1.5%) scale(1);
+  }
+  100% {
+    transform: translateX(1.5%) scale(1.03);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-proto__cloud--top,
+  .hero-proto__cloud--mid {
+    animation: none;
+  }
+}
+
+/* ---- Responsive: taller on larger screens ---- */
+@media (min-width: 640px) {
+  .hero-proto {
+    min-height: 480px;
+  }
+  .hero-proto__temp {
+    font-size: 112px;
+  }
+  .hero-proto__location {
+    font-size: 38px;
+  }
+}
+
 /* Optional safe-area helpers */
 .safe-top {
   padding-top: env(safe-area-inset-top);

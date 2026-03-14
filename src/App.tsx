@@ -20,7 +20,7 @@ import {
 } from "./lib/metrics";
 import { useStoredState } from "./lib/store";
 
-import IosTopArea from "./components/IosTopArea";
+import HeroPrototype from "./components/HeroPrototype";
 import IosGrid from "./components/IosGrid";
 import IosMetricCard from "./components/IosMetricCard";
 import IosUvCard from "./components/IosUvCard";
@@ -32,7 +32,6 @@ import Charts from "./components/Charts";
 import { Activity, Droplets, Gauge, Lightbulb, Leaf } from "lucide-react";
 
 const DEVICE_ID = "ws-01";
-const LOCATION = "Geiselhöring";
 
 type YSpec = {
   id: string;
@@ -296,15 +295,11 @@ export default function App() {
 
   return (
     <div className="wa-app min-h-screen">
+      {/* ── NEW full-width hero prototype (temporary) ── */}
+      <HeroPrototype />
+
       <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
-        <IosTopArea
-          location={LOCATION}
-          privacyLabel="PRIVAT"
-          tempC={tempC}
-          feelsC={feels}
-          hiC={hiT}
-          loC={loT}
-        />
+        {/* IosTopArea replaced by HeroPrototype above */}
 
         {latest?.ts ? (
           <div className="mt-2 text-center text-[12px] text-[rgb(var(--color-muted))]">
