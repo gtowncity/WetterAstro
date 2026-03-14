@@ -45,6 +45,7 @@ export default function IosBottomNav(props: {
 }) {
   const { dark, toggle } = useTheme();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
 
   const pages = Math.max(1, props.pages);
   const page = Math.min(Math.max(0, props.page), pages - 1);
@@ -104,6 +105,65 @@ export default function IosBottomNav(props: {
                   <div className="pb-2 pt-2 text-[12px] text-[rgb(var(--color-muted))]">
                     Werte: nur Sensor/History. Keine Forecast-Daten.
                   </div>
+
+                  <button
+                    type="button"
+                    onClick={() => { setMenuOpen(false); setCancelOpen(true); }}
+                    className="mt-1 w-full rounded-xl border border-red-400/30 bg-red-400/10 py-3 text-[14px] font-medium text-red-400 transition hover:bg-red-400/20 active:scale-[0.98]"
+                  >
+                    Abo kündigen
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {cancelOpen ? (
+        <div className="fixed inset-0 z-[90]">
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/35"
+            aria-label="Schließen"
+            onClick={() => setCancelOpen(false)}
+          />
+          <div className="absolute inset-x-0 bottom-0 pb-[calc(env(safe-area-inset-bottom)+12px)]">
+            <div className="mx-auto max-w-[520px] px-4">
+              <div className="overflow-hidden rounded-t-[28px] border border-white/10 bg-[rgb(var(--color-card))] shadow-ios-card backdrop-blur-xl backdrop-saturate-150">
+                <div className="flex items-center justify-between px-4 pt-3">
+                  <div className="h-1.5 w-10 rounded-full bg-white/20" />
+                  <button
+                    type="button"
+                    className="text-[13px] font-semibold text-[rgb(var(--color-fg))] opacity-80"
+                    onClick={() => setCancelOpen(false)}
+                  >
+                    Schließen
+                  </button>
+                </div>
+
+                <div className="px-4 pb-6 pt-3">
+                  <div className="text-[11px] font-semibold tracking-[0.22em] text-[rgb(var(--color-muted))]">
+                    ABO KÜNDIGEN
+                  </div>
+
+                  <p className="mt-3 text-[14px] leading-relaxed text-[rgb(var(--color-fg))] opacity-80">
+                    Um dein Abo zu kündigen, sende bitte eine E-Mail mit dem Betreff
+                    &ldquo;Kündigung&rdquo; an:
+                  </p>
+
+                  <a
+                    href="mailto:support@wetterastro.de?subject=K%C3%BCndigung"
+                    className="mt-3 block rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-center text-[15px] font-semibold text-sky-400 transition hover:bg-white/10"
+                  >
+                    support@wetterastro.de
+                  </a>
+
+                  <p className="mt-3 text-[12px] leading-relaxed text-[rgb(var(--color-muted))]">
+                    Bitte gib dabei deinen Namen und die E-Mail-Adresse an, mit der du
+                    das Abo abgeschlossen hast. Deine Kündigung wird innerhalb von 2
+                    Werktagen bestätigt.
+                  </p>
                 </div>
               </div>
             </div>
