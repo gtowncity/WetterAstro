@@ -102,7 +102,7 @@ body::before {
   mix-blend-mode: screen;
   animation: wa-clouds 26s ease-in-out infinite alternate;
 }
-ody.dark body::before {
+.dark body::before {
   opacity: 0.78;
 }
 
@@ -117,12 +117,12 @@ body::after {
 
   background-image:
     radial-gradient(
-      120% 80% at 50% 0%,”
+      120% 80% at 50% 0%,
       rgba(0, 0, 0, 0.00),
       rgba(0, 0, 0, 0.62) 72%
     ),
     radial-gradient(
-      120% 80% at 50% 100%,”
+      120% 80% at 50% 100%,
       rgba(0, 0, 0, 0.10),
       rgba(0, 0, 0, 0.72) 72%
     );
@@ -246,6 +246,32 @@ body::after {
 
 .dark .wa-card-surface {
   opacity: 0.18;
+}
+
+/* Hero: cinematic top section */
+.wa-hero {
+  position: relative;
+}
+
+/* Subtle centered radial sky-glow behind the hero text (dark mode only) */
+.dark .wa-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(
+      ellipse 160% 55% at 50% -5%,
+      rgba(50, 110, 200, 0.28),
+      transparent 68%
+    );
+}
+
+/* All direct children of wa-hero sit above the pseudo glow */
+.wa-hero > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Optional safe-area helpers */

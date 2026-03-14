@@ -26,7 +26,7 @@ export default function IosTopArea(props: Props) {
     Number.isFinite(props.loC);
 
   return (
-    <header className="pt-[calc(env(safe-area-inset-top)+18px)] text-center font-ios">
+    <header className="wa-hero pt-[calc(env(safe-area-inset-top)+32px)] pb-8 text-center font-ios">
       <div className="flex items-center justify-center gap-2 text-[11px] font-semibold tracking-[0.28em] text-[rgb(var(--color-muted))]">
         <Navigation className="h-3.5 w-3.5 opacity-80" />
         <span>{props.privacyLabel ?? "PRIVAT"}</span>
@@ -46,13 +46,13 @@ export default function IosTopArea(props: Props) {
         ) : null}
 
         {hasFeels ? (
-          <div className="mt-1 text-[18px] leading-tight text-[rgb(var(--color-fg))] opacity-75">
+          <div className="mt-1 text-[15px] leading-tight text-[rgb(var(--color-fg))] opacity-60">
             Gefühlt: {fmtDeg(props.feelsC)}
           </div>
         ) : null}
 
         {hasHiLo ? (
-          <div className="mt-0.5 text-[18px] leading-tight text-[rgb(var(--color-fg))] opacity-75">
+          <div className="mt-0.5 text-[15px] leading-tight text-[rgb(var(--color-fg))] opacity-60">
             H: {fmtDeg(props.hiC)}&nbsp;&nbsp;T: {fmtDeg(props.loC)}
           </div>
         ) : null}
