@@ -20,7 +20,6 @@ import {
 } from "./lib/metrics";
 import { useStoredState } from "./lib/store";
 
-import IosTopArea from "./components/IosTopArea";
 import IosGrid from "./components/IosGrid";
 import IosMetricCard from "./components/IosMetricCard";
 import IosUvCard from "./components/IosUvCard";
@@ -28,12 +27,11 @@ import IosBottomNav from "./components/IosBottomNav";
 import IosFeelsCard from "./components/IosFeelsCard";
 import { Card } from "./components/Card";
 import Charts from "./components/Charts";
+import HeroPrototype from "./components/HeroPrototype";
 
 import { Activity, Droplets, Gauge, Lightbulb, Leaf } from "lucide-react";
 
 const DEVICE_ID = "ws-01";
-const LOCATION = "Geiselhöring";
-
 type YSpec = {
   id: string;
   orientation?: "left" | "right";
@@ -296,16 +294,9 @@ export default function App() {
 
   return (
     <div className="wa-app min-h-screen">
-      <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
-        <IosTopArea
-          location={LOCATION}
-          privacyLabel="PRIVAT"
-          tempC={tempC}
-          feelsC={feels}
-          hiC={hiT}
-          loC={loT}
-        />
+      <HeroPrototype />
 
+      <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
         {latest?.ts ? (
           <div className="mt-2 text-center text-[12px] text-[rgb(var(--color-muted))]">
             Letztes Update: {lastAbs} ({lastAgo})
