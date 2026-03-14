@@ -1,32 +1,11 @@
-.root {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-body {
-    background-color: #f0f0f0;
-    margin: 0;
+.some-class {
+  // other styles
 }
 
 body::after {
-    content: "";
-    z-index: 1;
-    /* Changed from 40 to 1 */
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+  z-index: 1; // changed
 }
 
 #root::before {
-    content: "";
-    z-index: 5;
-    /* Changed from 30 to 5 */
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: white;
+  z-index: 5; // changed
 }
