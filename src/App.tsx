@@ -296,22 +296,18 @@ export default function App() {
 
   return (
     <div className="wa-app min-h-screen">
+      {/* Hero is full-width — outside the narrow content container */}
+      <IosTopArea
+        location={LOCATION}
+        privacyLabel="PRIVAT"
+        tempC={tempC}
+        feelsC={feels}
+        hiC={hiT}
+        loC={loT}
+        lastUpdateLabel={latest?.ts ? `${lastAbs} · ${lastAgo}` : null}
+      />
+
       <main className="mx-auto max-w-[520px] px-4 pb-[calc(env(safe-area-inset-bottom)+112px)]">
-        <IosTopArea
-          location={LOCATION}
-          privacyLabel="PRIVAT"
-          tempC={tempC}
-          feelsC={feels}
-          hiC={hiT}
-          loC={loT}
-        />
-
-        {latest?.ts ? (
-          <div className="mt-2 text-center text-[12px] text-[rgb(var(--color-muted))]">
-            Letztes Update: {lastAbs} ({lastAgo})
-          </div>
-        ) : null}
-
         {err ? (
           <Card className="mt-4 border-rose-500/30 bg-rose-500/10 p-4">
             <div className="text-sm font-semibold text-[rgb(var(--color-fg))]">Fehler</div>

@@ -102,7 +102,7 @@ body::before {
   mix-blend-mode: screen;
   animation: wa-clouds 26s ease-in-out infinite alternate;
 }
-ody.dark body::before {
+.dark body::before {
   opacity: 0.78;
 }
 
@@ -117,12 +117,12 @@ body::after {
 
   background-image:
     radial-gradient(
-      120% 80% at 50% 0%,”
+      120% 80% at 50% 0%,
       rgba(0, 0, 0, 0.00),
       rgba(0, 0, 0, 0.62) 72%
     ),
     radial-gradient(
-      120% 80% at 50% 100%,”
+      120% 80% at 50% 100%,
       rgba(0, 0, 0, 0.10),
       rgba(0, 0, 0, 0.72) 72%
     );
@@ -246,6 +246,105 @@ body::after {
 
 .dark .wa-card-surface {
   opacity: 0.18;
+}
+
+/* Hero: cinematic full-bleed stage */
+.wa-hero {
+  position: relative;
+  overflow: hidden;
+  /* Light-mode: soft sky atmosphere */
+  background: linear-gradient(
+    to bottom,
+    rgba(155, 200, 255, 0.60) 0%,
+    rgba(180, 218, 255, 0.32) 55%,
+    transparent 100%
+  );
+}
+
+/* Dark-mode: deep atmospheric sky with side volume */
+.dark .wa-hero {
+  background:
+    radial-gradient(ellipse 130% 55% at 50% -8%, rgba(20, 50, 120, 0.88), transparent 68%),
+    radial-gradient(ellipse 80% 40% at 18% 35%, rgba(12, 35, 100, 0.52), transparent 72%),
+    radial-gradient(ellipse 75% 38% at 82% 28%, rgba(14, 38, 105, 0.48), transparent 72%),
+    linear-gradient(to bottom, rgba(6, 12, 40, 1.0) 0%, rgba(8, 16, 50, 0.90) 45%, rgba(9, 18, 55, 0.58) 75%, transparent 100%);
+}
+
+/* Multi-layer cloud-mass & atmospheric glow (dark mode) */
+.dark .wa-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 110% 52% at 50% -2%,  rgba(110, 168, 255, 0.52), transparent 62%),
+    radial-gradient(ellipse 68%  40% at 12% 22%,  rgba(85,  148, 240, 0.30), transparent 68%),
+    radial-gradient(ellipse 62%  36% at 88% 18%,  rgba(80,  142, 235, 0.26), transparent 68%),
+    radial-gradient(ellipse 85%  62% at 50% 60%,  rgba(35,   85, 200, 0.58), transparent 64%),
+    radial-gradient(ellipse 62%  24% at 50% 38%,  rgba(140, 195, 255, 0.26), transparent 58%);
+}
+
+/* Bottom separator: long cinematic fade into card area */
+.wa-hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 200px;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(to bottom, transparent 0%, transparent 15%, rgb(var(--color-bg)) 82%);
+}
+
+/* All direct hero children float above pseudo layers */
+.wa-hero > * {
+  position: relative;
+  z-index: 3;
+}
+
+/* Fixed sky zone above text block — cloud area with definite height */
+.wa-hero-sky-spacer {
+  flex: 0 0 22dvh;
+}
+
+/* Cloud / fog SVG container — absolute upper sky zone */
+.wa-hero-clouds {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 65%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.wa-hero-cloud-svg {
+  width: 100%;
+  height: 100%;
+  filter: blur(12px);
+  opacity: 0.62;
+}
+
+.dark .wa-hero-cloud-svg {
+  filter: blur(12px) brightness(1.4);
+  opacity: 1;
+  animation: wa-clouds 34s ease-in-out infinite alternate;
+}
+
+/* Radial glow behind temperature number (dark mode) */
+.wa-hero-temp {
+  position: relative;
+}
+
+.dark .wa-hero-temp::before {
+  content: "";
+  position: absolute;
+  inset: -50% -35%;
+  background: radial-gradient(ellipse 68% 58% at 50% 55%, rgba(45, 100, 210, 0.42), transparent 68%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 /* Optional safe-area helpers */
