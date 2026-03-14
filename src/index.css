@@ -64,15 +64,82 @@ body,
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  min-height: clamp(360px, 78vh, 560px);
-  padding-top: calc(env(safe-area-inset-top) + 20px);
+  min-height: clamp(420px, 82vh, 680px);
+  padding-top: calc(env(safe-area-inset-top) + 14px);
   border-bottom-left-radius: 36px;
   border-bottom-right-radius: 36px;
   background:
-    radial-gradient(120% 84% at 50% -8%, rgba(162, 197, 255, 0.25), transparent 58%),
-    radial-gradient(70% 56% at 76% 22%, rgba(117, 158, 220, 0.22), transparent 62%),
-    linear-gradient(180deg, rgba(20, 40, 70, 0.95) 0%, rgba(13, 29, 55, 0.98) 42%, rgba(8, 19, 38, 1) 100%);
-  box-shadow: inset 0 -48px 70px rgba(0, 0, 0, 0.32);
+    radial-gradient(120% 86% at 50% -10%, rgba(205, 215, 232, 0.26), transparent 58%),
+    radial-gradient(92% 68% at 12% 24%, rgba(126, 139, 168, 0.22), transparent 62%),
+    radial-gradient(92% 68% at 88% 25%, rgba(116, 130, 162, 0.2), transparent 64%),
+    linear-gradient(180deg, #8d95a7 0%, #757e93 36%, #6d768b 58%, #6d758a 100%);
+  box-shadow: inset 0 -44px 70px rgba(18, 20, 31, 0.22);
+}
+
+.hero-statusbar {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  color: rgba(249, 251, 255, 0.95);
+  font-size: 1.88rem;
+  font-weight: 600;
+}
+
+.hero-time {
+  font-size: 0.92rem;
+  letter-spacing: 0.01em;
+}
+
+.hero-island {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 168px;
+  height: 38px;
+  border-radius: 999px;
+  background: #090b12;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.hero-island-camera {
+  width: 22px;
+  height: 14px;
+  margin-right: 58px;
+  border: 1px solid rgba(57, 143, 255, 0.85);
+  border-radius: 999px;
+  opacity: 0.9;
+}
+
+.hero-island-pill {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(44, 53, 79, 0.84);
+  margin-left: 8px;
+}
+
+.hero-signals {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.hero-wifi {
+  font-size: 0.86rem;
+  opacity: 0.92;
+}
+
+.hero-battery {
+  font-size: 0.74rem;
+  line-height: 1;
+  padding: 3px 7px;
+  border-radius: 999px;
+  border: 1px solid rgba(234, 239, 250, 0.34);
+  background: rgba(230, 237, 250, 0.18);
 }
 
 .hero-sky-depth,
@@ -85,82 +152,103 @@ body,
 
 .hero-sky-depth {
   background:
-    radial-gradient(58% 46% at 50% 26%, rgba(132, 168, 235, 0.24), transparent 72%),
-    radial-gradient(58% 46% at 18% 34%, rgba(89, 122, 181, 0.22), transparent 76%),
-    radial-gradient(58% 46% at 82% 34%, rgba(90, 120, 174, 0.22), transparent 76%);
-  opacity: 0.92;
+    radial-gradient(78% 54% at 48% 22%, rgba(226, 232, 246, 0.35), transparent 74%),
+    radial-gradient(42% 42% at 18% 38%, rgba(110, 122, 150, 0.34), transparent 80%),
+    radial-gradient(42% 42% at 82% 34%, rgba(109, 121, 149, 0.28), transparent 82%);
+  opacity: 0.96;
 }
 
 .hero-cloudbank {
-  inset: -6% -16% auto -16%;
-  height: 42%;
+  inset: 7% -18% auto -18%;
+  height: 43%;
   background:
-    radial-gradient(38% 50% at 16% 38%, rgba(206, 220, 242, 0.38), transparent 72%),
-    radial-gradient(40% 54% at 42% 34%, rgba(194, 212, 238, 0.36), transparent 72%),
-    radial-gradient(42% 58% at 74% 36%, rgba(188, 207, 234, 0.34), transparent 74%),
-    radial-gradient(35% 48% at 92% 42%, rgba(184, 206, 236, 0.28), transparent 74%);
-  filter: blur(18px);
-  opacity: 0.8;
+    radial-gradient(34% 46% at 10% 42%, rgba(241, 246, 255, 0.4), transparent 74%),
+    radial-gradient(38% 48% at 30% 34%, rgba(231, 239, 251, 0.38), transparent 74%),
+    radial-gradient(42% 52% at 54% 37%, rgba(222, 232, 247, 0.34), transparent 76%),
+    radial-gradient(40% 50% at 78% 36%, rgba(215, 226, 244, 0.32), transparent 78%),
+    radial-gradient(35% 46% at 94% 44%, rgba(204, 218, 240, 0.3), transparent 80%);
+  filter: blur(22px);
+  opacity: 0.82;
 }
 
 .hero-cloudbank-secondary {
-  top: 10%;
-  left: -10%;
-  right: -10%;
-  height: 28%;
-  transform: scale(1.02);
-  filter: blur(24px);
-  opacity: 0.55;
+  top: 23%;
+  left: -8%;
+  right: -8%;
+  height: 35%;
+  transform: scale(1.03);
+  filter: blur(30px);
+  opacity: 0.45;
 }
 
 .hero-haze {
-  inset: auto -10% 22% -10%;
-  height: 44%;
+  inset: auto -8% 16% -8%;
+  height: 56%;
   background:
-    radial-gradient(56% 68% at 22% 78%, rgba(120, 155, 214, 0.2), transparent 72%),
-    radial-gradient(56% 68% at 78% 72%, rgba(108, 147, 206, 0.16), transparent 72%);
+    radial-gradient(68% 72% at 12% 86%, rgba(132, 144, 171, 0.18), transparent 70%),
+    radial-gradient(68% 72% at 86% 84%, rgba(122, 135, 163, 0.18), transparent 72%);
 }
 
 .hero-content {
   position: absolute;
   left: 24px;
   right: 24px;
-  bottom: 42px;
+  top: 19%;
   z-index: 2;
-  color: #f1f6ff;
-  text-shadow: 0 6px 24px rgba(3, 8, 18, 0.45);
+  text-align: center;
+  color: rgba(245, 247, 251, 0.96);
+  text-shadow: 0 6px 26px rgba(40, 46, 64, 0.24);
+}
+
+.hero-private {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 1.03rem;
+  font-weight: 640;
+  letter-spacing: 0.03em;
+}
+
+.hero-private::before {
+  content: "➤";
+  font-size: 0.7em;
+  transform: rotate(-45deg);
+  opacity: 0.86;
 }
 
 .hero-location {
-  margin: 0;
-  font-size: 1.35rem;
-  line-height: 1.2;
-  font-weight: 560;
-  letter-spacing: 0.01em;
+  margin: 0.3rem 0 0;
+  font-size: clamp(2.45rem, 11.6vw, 4.3rem);
+  line-height: 1.04;
+  font-weight: 500;
+  letter-spacing: -0.02em;
 }
 
 .hero-temp {
-  margin: 0.22rem 0 0;
-  font-size: clamp(4.2rem, 19vw, 6.8rem);
-  line-height: 0.92;
-  font-weight: 260;
-  letter-spacing: -0.025em;
+  margin: 0.34rem 0 0;
+  font-size: clamp(7.1rem, 32vw, 12rem);
+  line-height: 0.88;
+  font-weight: 210;
+  letter-spacing: -0.055em;
 }
 
 .hero-secondary {
-  margin: 0.62rem 0 0;
-  color: rgba(232, 241, 255, 0.9);
-  font-size: 0.95rem;
-  letter-spacing: 0.008em;
+  margin: 0.4rem 0 0;
+  color: rgba(238, 242, 250, 0.98);
+  font-size: clamp(2rem, 8.7vw, 3rem);
+  font-weight: 390;
+  letter-spacing: -0.03em;
+  line-height: 1;
 }
 
-.hero-forecast {
-  margin: 0.52rem 0 0;
-  max-width: 28ch;
-  color: rgba(226, 238, 255, 0.94);
-  font-size: 1rem;
-  line-height: 1.35;
-  font-weight: 480;
+.hero-tertiary {
+  margin: 0.42rem 0 0;
+  color: rgba(240, 244, 250, 0.95);
+  font-size: clamp(1.75rem, 7.3vw, 2.55rem);
+  font-weight: 390;
+  letter-spacing: -0.02em;
+  line-height: 1;
 }
 
 .hero-fade {
@@ -168,21 +256,34 @@ body,
   margin-top: -1px;
   background: linear-gradient(
     180deg,
-    rgba(var(--hero-bottom-rgb), 0.94) 0%,
-    rgba(var(--hero-bottom-rgb), 0.58) 52%,
+    rgba(109, 117, 138, 0.92) 0%,
+    rgba(109, 117, 138, 0.55) 52%,
     rgba(var(--color-bg), 0) 100%
   );
 }
 
 @media (min-width: 640px) {
+  .hero-statusbar {
+    padding: 2px 22px 0;
+  }
+
+  .hero-island {
+    width: 200px;
+    height: 42px;
+  }
+
+  .hero-island-camera {
+    margin-right: 70px;
+  }
+
   .hero-content {
     left: 32px;
     right: 32px;
-    bottom: 48px;
+    top: 20%;
   }
 
   .hero-stage {
-    min-height: 470px;
+    min-height: 760px;
   }
 }
 
