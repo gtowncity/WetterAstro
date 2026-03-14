@@ -57,6 +57,7 @@ body,
 .hero-prototype {
   position: relative;
   width: 100%;
+  --hero-bottom-rgb: 8 19 38;
 }
 
 .hero-stage {
@@ -167,8 +168,8 @@ body,
   margin-top: -1px;
   background: linear-gradient(
     180deg,
-    rgba(8, 19, 38, 0.94) 0%,
-    rgba(8, 19, 38, 0.58) 52%,
+    rgba(var(--hero-bottom-rgb), 0.94) 0%,
+    rgba(var(--hero-bottom-rgb), 0.58) 52%,
     rgba(var(--color-bg), 0) 100%
   );
 }
