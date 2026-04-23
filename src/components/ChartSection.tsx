@@ -5,9 +5,9 @@ import { Card } from "./Card";
 type YSpec = {
   id: string;
   orientation?: "left" | "right";
-  domain?: any;
+  domain?: [number, number];
   hide?: boolean;
-  tickFormatter?: (v: any) => string;
+  tickFormatter?: (v: number) => string;
 };
 
 type LSpec = {

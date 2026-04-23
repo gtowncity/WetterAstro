@@ -44,7 +44,7 @@ export type Reading = {
 };
 
 const API_BASE =
-  (import.meta as any).env?.VITE_API_BASE?.toString()?.trim() ||
+  import.meta.env.VITE_API_BASE?.toString()?.trim() ||
   "https://weather-worker.weather-emma.workers.dev";
 
 export async function apiLatest(deviceId: string): Promise<Reading | null> {

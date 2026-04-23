@@ -37,9 +37,9 @@ const LOCATION = "Geiselhöring";
 type YSpec = {
   id: string;
   orientation?: "left" | "right";
-  domain?: any;
+  domain?: [number, number];
   hide?: boolean;
-  tickFormatter?: (v: any) => string;
+  tickFormatter?: (v: number) => string;
 };
 
 type LSpec = {
@@ -165,9 +165,9 @@ export default function App() {
         if (!alive) return;
         setLatest(r);
         setErr(null);
-      } catch (e: any) {
+      } catch (e: unknown) {
         if (!alive) return;
-        setErr(e?.message || "latest failed");
+        setErr(e instanceof Error ? e.message : "latest failed");
       }
     };
 
@@ -186,41 +186,70 @@ export default function App() {
     };
   }, [autoRefresh]);
 
-  async function loadHistory(range: RangeKey, setter: (d: Reading[]) => void) {
+  async function loadHistory(range: RangeKey): Promise<Reading[]> {
     try {
       const hours = fetchHoursForRange(range);
       const data = await apiHistory(DEVICE_ID, hours);
-      setter(data);
       setErr(null);
-    } catch (e: any) {
-      setErr(e?.message || "history failed");
+      return data;
+    } catch (e: unknown) {
+      setErr(e instanceof Error ? e.message : "history failed");
+      return [];
     }
   }
 
   useEffect(() => {
-    loadHistory(rTHP, setHTHP);
+    let alive = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadHistory(rTHP).then((data) => {
+      if (alive) setHTHP(data);
+    });
+    return () => {
+      alive = false;
+    };
   }, [rTHP]);
 
   useEffect(() => {
-    loadHistory(rUVL, setHUVL);
+    let alive = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadHistory(rUVL).then((data) => {
+      if (alive) setHUVL(data);
+    });
+    return () => {
+      alive = false;
+    };
   }, [rUVL]);
 
   useEffect(() => {
-    loadHistory(rAIR, setHAIR);
+    let alive = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadHistory(rAIR).then((data) => {
+      if (alive) setHAIR(data);
+    });
+    return () => {
+      alive = false;
+    };
   }, [rAIR]);
 
   useEffect(() => {
-    loadHistory(rVIB, setHVIB);
+    let alive = true;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void loadHistory(rVIB).then((data) => {
+      if (alive) setHVIB(data);
+    });
+    return () => {
+      alive = false;
+    };
   }, [rVIB]);
 
   useEffect(() => {
     if (!autoRefresh) return;
 
     const t = setInterval(() => {
-      loadHistory(rTHP, setHTHP);
-      loadHistory(rUVL, setHUVL);
-      loadHistory(rAIR, setHAIR);
-      loadHistory(rVIB, setHVIB);
+      void loadHistory(rTHP).then(setHTHP);
+      void loadHistory(rUVL).then(setHUVL);
+      void loadHistory(rAIR).then(setHAIR);
+      void loadHistory(rVIB).then(setHVIB);
     }, 60_000);
 
     return () => clearInterval(t);
@@ -229,15 +258,8 @@ export default function App() {
   const lastAbs = useMemo(() => fmtLocal(latest?.ts), [latest?.ts]);
   const lastAgo = useMemo(() => fmtAgo(latest?.ts), [latest?.ts]);
 
-  const feels = useMemo(() => {
-    if (latest?.t == null || latest?.h == null) return null;
-    return humidex(latest.t, latest.h);
-  }, [latest?.t, latest?.h]);
-
-  const dew = useMemo(() => {
-    if (latest?.t == null || latest?.h == null) return null;
-    return dewPointC(latest.t, latest.h);
-  }, [latest?.t, latest?.h]);
+  const feels = latest?.t == null || latest?.h == null ? null : humidex(latest.t, latest.h);
+  const dew = latest?.t == null || latest?.h == null ? null : dewPointC(latest.t, latest.h);
 
   const lux = useMemo(() => luxApproxFromOhm(latest?.ldr_r ?? null), [latest?.ldr_r]);
   const darkLabel = useMemo(() => darknessFromLux(lux), [lux]);
