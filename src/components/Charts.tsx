@@ -15,9 +15,9 @@ import { parseTsLocal } from "../lib/time";
 type YSpec = {
   id: string;
   orientation?: "left" | "right";
-  domain?: any;
+  domain?: [number, number];
   hide?: boolean;
-  tickFormatter?: (v: any) => string;
+  tickFormatter?: (v: number) => string;
 };
 
 type LSpec = {
@@ -58,12 +58,14 @@ export default function Charts(props: {
   lines: LSpec[];
 }) {
   const { filtered, nowX } = useMemo(() => {
-    const now = props.nowTs ? parseTsLocal(props.nowTs).getTime() : Date.now();
-    const from = now - props.rangeMs;
+    const fallbackTs = props.data.length ? props.data[props.data.length - 1].ts : null;
+    const now = parseTsLocal(props.nowTs ?? fallbackTs ?? "").getTime();
+    const safeNow = Number.isFinite(now) ? now : 0;
+    const from = safeNow - props.rangeMs;
 
     const cropped = props.data.filter((r) => {
       const t = parseTsLocal(r.ts).getTime();
-      return Number.isFinite(t) && t >= from && t <= now + 60_000;
+      return Number.isFinite(t) && t >= from && t <= safeNow + 60_000;
     });
 
     const max =
@@ -72,7 +74,7 @@ export default function Charts(props: {
     const ds = downsample(cropped, max);
     const lastTs = ds.length ? ds[ds.length - 1].ts : undefined;
 
-    return { filtered: ds, nowX: lastTs ?? props.nowTs ?? undefined };
+    return { filtered: ds, nowX: lastTs ?? props.nowTs ?? fallbackTs ?? undefined };
   }, [props.data, props.rangeMs, props.nowTs]);
 
   return (

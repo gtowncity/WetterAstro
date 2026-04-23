@@ -14,7 +14,9 @@ export function useStoredState<T>(key: string, defaultValue: T) {
   useEffect(() => {
     try {
       window.localStorage.setItem(key, JSON.stringify(state));
-    } catch {}
+    } catch {
+      // ignore storage write failures
+    }
   }, [key, state]);
 
   return [state, setState] as const;
